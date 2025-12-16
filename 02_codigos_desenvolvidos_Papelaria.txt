@@ -1,0 +1,1110 @@
+---------------------------------------------------------------------------
+--FUNCTIONS
+---------------------------------------------------------------------------
+
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: formatar exibição de celular 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_FORMATA_CELULAR(
+    P_CELULAR IN VARCHAR2
+    ) 
+    RETURN VARCHAR2
+IS
+    V_RESULTADO VARCHAR2(15);
+BEGIN
+    V_RESULTADO := '('  || SUBSTR(P_CELULAR,1,2) ||
+                 ')'  || SUBSTR(P_CELULAR,3,5) ||
+                 '-'  || SUBSTR(P_CELULAR,8);
+    RETURN V_RESULTADO;
+END FC_PAP_FORMATA_CELULAR;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: formatar exibição de CNPJ 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_FORMATA_CNPJ(
+    P_CNPJ IN VARCHAR2
+    ) 
+    RETURN VARCHAR2 
+IS
+    V_RESULTADO VARCHAR2(18);
+BEGIN
+    V_RESULTADO := SUBSTR(P_CNPJ,1,2)||'.'||
+                 SUBSTR(P_CNPJ,3,3)||'.'||
+                 SUBSTR(P_CNPJ,6,3)||'/'||
+                 SUBSTR(P_CNPJ,9,4)||'-'||
+                 SUBSTR(P_CNPJ,13,2);
+    RETURN V_RESULTADO;
+END FC_PAP_FORMATA_CNPJ;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: formatar exibição de CPF 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_FORMATA_CPF(
+    P_CPF IN VARCHAR2
+    ) 
+    RETURN VARCHAR2
+IS
+    V_RESULTADO VARCHAR2(18);
+BEGIN
+    V_RESULTADO := SUBSTR(P_CPF,1,3)||'.'||
+                 SUBSTR(P_CPF,4,3)||'.'||
+                 SUBSTR(P_CPF,7,3)||'-'||
+                 SUBSTR(P_CPF,10,4);
+    RETURN V_RESULTADO;
+END FC_PAP_FORMATA_CPF;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: Obter o código do produto
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_GET_PRODUTO(
+    P_DESC_PRODUTO T_PAP_PRODUTO.DES_PROD%TYPE
+    )
+    RETURN NUMBER 
+IS
+    V_CD_PRODUTO T_PAP_PRODUTO.CD_PROD%TYPE;
+    V_CHECK NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_CHECK
+      FROM T_PAP_PRODUTO
+     WHERE DES_PROD = P_DESC_PRODUTO;
+     
+    IF V_CHECK > 0  THEN
+     SELECT CD_PROD
+       INTO V_CD_PRODUTO
+       FROM T_PAP_PRODUTO
+      WHERE DES_PROD = P_DESC_PRODUTO;
+     ELSE
+        RAISE_APPLICATION_ERROR (-20200, 'Produto não cadastrado');   
+     END IF;
+    RETURN V_CD_PRODUTO;
+END FC_PAP_GET_PRODUTO;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: Obter o código da pessoa cadastrada
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_GET_PESSOA(
+    P_NOME_PESSOA VARCHAR2
+    )
+    RETURN NUMBER 
+IS
+    V_CD_PESSOA T_PAP_PESSOA.CD_PESSOA%TYPE;
+    V_CHECK NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_CHECK
+      FROM T_PAP_PESSOA
+     WHERE T_PAP_PESSOA.NM_PESSOA = P_NOME_PESSOA;
+     
+    IF V_CHECK > 0  THEN
+     SELECT CD_PESSOA
+       INTO V_CD_PESSOA
+       FROM T_PAP_PESSOA
+      WHERE NM_PESSOA = P_NOME_PESSOA;
+     ELSE
+        RAISE_APPLICATION_ERROR (-20200, 'Pessoa não cadastrada!');   
+     END IF;
+    RETURN V_CD_PESSOA;
+END FC_PAP_GET_PESSOA;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: Obter o código do funcionário cadastrado
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_GET_FUNCIONARIO(
+    P_NOME_PESSOA VARCHAR2
+    )
+    RETURN NUMBER 
+IS
+    V_CD_FUNC  T_PAP_FUNCIONARIO.CD_FUNC%TYPE;
+    V_CHECK NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_CHECK
+      FROM T_PAP_PESSOA
+     INNER JOIN T_PAP_FUNCIONARIO
+        ON T_PAP_PESSOA.CD_PESSOA = T_PAP_FUNCIONARIO.CD_PESSOA
+     WHERE T_PAP_PESSOA.NM_PESSOA = P_NOME_PESSOA;
+     
+    IF V_CHECK > 0  THEN
+     SELECT CD_FUNC
+       INTO V_CD_FUNC
+       FROM T_PAP_PESSOA
+      INNER JOIN T_PAP_FUNCIONARIO
+         ON T_PAP_PESSOA.CD_PESSOA = T_PAP_FUNCIONARIO.CD_PESSOA
+      WHERE NM_PESSOA = P_NOME_PESSOA;
+     ELSE
+        RAISE_APPLICATION_ERROR (-20200, 'Funcionário não cadastrado!');   
+     END IF;
+    RETURN V_CD_FUNC;
+END FC_PAP_GET_FUNCIONARIO;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: Obter o código do funcionario com perfil de vendedor 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_GET_VENDEDOR(
+    P_NOME_PESSOA VARCHAR2
+    )
+    RETURN NUMBER 
+IS
+    V_CD_VENDEDOR T_PAP_FUNCIONARIO.CD_FUNC%TYPE;
+    V_CHECK NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_CHECK
+      FROM T_PAP_PESSOA
+     INNER JOIN T_PAP_FUNCIONARIO
+        ON T_PAP_PESSOA.CD_PESSOA = T_PAP_FUNCIONARIO.CD_PESSOA
+     WHERE T_PAP_PESSOA.NM_PESSOA = P_NOME_PESSOA
+       AND T_PAP_FUNCIONARIO.CD_VENDEDOR IS NOT NULL;
+     
+    IF V_CHECK > 0  THEN
+     SELECT CD_VENDEDOR
+       INTO V_CD_VENDEDOR
+       FROM T_PAP_PESSOA
+      INNER JOIN T_PAP_FUNCIONARIO
+         ON T_PAP_PESSOA.CD_PESSOA = T_PAP_FUNCIONARIO.CD_PESSOA
+      WHERE NM_PESSOA = P_NOME_PESSOA;
+     ELSE
+        RAISE_APPLICATION_ERROR (-20200, 'Vendedor não cadastrado!');   
+     END IF;
+    RETURN V_CD_VENDEDOR;
+END FC_PAP_GET_VENDEDOR;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: Obter o nome do setor  
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_GET_SETOR(
+    P_CD_SETOR NUMBER
+    )
+    RETURN VARCHAR2 
+IS
+    V_NM_SETOR T_PAP_SETOR.NM_SETOR%TYPE;
+    V_CHECK NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_CHECK
+      FROM T_PAP_SETOR
+     WHERE CD_SETOR = P_CD_SETOR;
+     
+    IF V_CHECK > 0  THEN
+     SELECT NM_SETOR
+       INTO V_NM_SETOR
+       FROM T_PAP_SETOR
+      WHERE CD_SETOR = P_CD_SETOR;
+     ELSE
+        RAISE_APPLICATION_ERROR (-20200, 'Setor não existe!');   
+     END IF;
+    RETURN V_NM_SETOR;
+END FC_PAP_GET_SETOR;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: verificar se item de NF já existe na tabela de movimento 
+--             impedidir duplicidade de entrada do mesmo item da NF
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_CHECK_NF_ITEM_MOV(
+    P_NF      T_PAP_NF_ENT_ITEM.CD_NF%TYPE,
+    P_NF_ITEM T_PAP_NF_ENT_ITEM.CD_NF_ITEM%TYPE
+    )
+    RETURN NUMBER
+IS 
+    V_CHECK NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_CHECK
+      FROM T_PAP_MOVIMENTO_ESTOQUE
+     WHERE CD_NF = P_NF
+       AND CD_NF_ITEM = P_NF_ITEM;
+     
+    IF V_CHECK = 0  THEN
+        RETURN V_CHECK;
+     ELSE
+        RAISE_APPLICATION_ERROR (-20200, 'NF já existente!');   
+     END IF;
+END FC_PAP_CHECK_NF_ITEM_MOV;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: validar CNPJ digitado
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_CHECK_CNPJ(
+   P_CGC IN CHAR)
+   RETURN BOOLEAN
+IS
+   V_TOTAL  NUMBER := 0;
+   V_DIGITO NUMBER := 0;
+BEGIN
+ FOR i IN 1..4 LOOP
+     V_TOTAL := V_TOTAL + SUBSTR(P_CGC,i,1) * (6 - i);
+ END LOOP;
+
+ FOR i IN 5..12 LOOP
+     V_TOTAL := V_TOTAL + SUBSTR(P_CGC,i,1) * (14 - i);
+ END LOOP;
+
+ V_DIGITO := 11 - mod(V_TOTAL,11);
+
+ IF V_DIGITO > 9 THEN
+    V_DIGITO := 0;
+ END IF;
+
+ IF V_DIGITO != SUBSTR(P_CGC,13,1) THEN
+    RETURN FALSE;
+ END IF;
+
+ V_DIGITO := 0;
+ V_TOTAL  := 0;
+
+ FOR i IN 1..5 LOOP
+     V_TOTAL := V_TOTAL + SUBSTR(P_CGC,i,1) * (7 - i);
+ END LOOP;
+
+ FOR i IN 6..13 LOOP
+     V_TOTAL := V_TOTAL + SUBSTR(P_CGC,i,1) * (15 - i);
+ END LOOP;
+
+ V_DIGITO := 11 - mod(V_TOTAL,11);
+
+ IF V_DIGITO > 9 THEN
+    V_DIGITO := 0;
+ END IF;
+
+ IF V_DIGITO != SUBSTR(P_CGC,14,1) THEN
+    RETURN FALSE;
+ END IF;
+ RETURN TRUE;
+END FC_PAP_CHECK_CNPJ;
+
+/
+
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Function
+-- Finalidade: criptografar a senha do usuario
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FC_PAP_UTIL_MD5(
+    VALOR VARCHAR2) 
+    RETURN VARCHAR2 
+IS
+  V_INPUT VARCHAR2(255) := VALOR;
+  HEXKEY  VARCHAR2(32) := NULL;
+BEGIN
+  HEXKEY := RAWTOHEX(DBMS_OBFUSCATION_TOOLKIT.MD5(INPUT => UTL_RAW.CAST_TO_RAW(V_INPUT)));
+  RETURN NVL(HEXKEY, '');
+END;
+
+/
+
+
+---------------------------------------------------------------------------
+--PROCEDURES
+---------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Procedure
+-- Finalidade: gravar log 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_PAP_REGISTRA_LOG(
+    P_LOG_TEXTO IN VARCHAR2
+    ) AS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+    INSERT INTO T_PAP_LOG
+         VALUES(SEQ_PAP_LOG_AUDIT.NEXTVAL,
+                SYSDATE,
+                USER,
+                P_LOG_TEXTO);
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+    ROLLBACK;
+END;
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Procedure
+-- Finalidade: lançar NF de entrada, tabela T_PAP_NF_ENTRADA
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_PAP_NF_ENTRADA(
+    P_CD_OC IN t_pap_nf_entrada.CD_OC%TYPE,
+    P_CD_FORNEC IN t_pap_nf_entrada.CD_FORNEC%TYPE,
+    P_CD_SETOR IN t_pap_nf_entrada.CD_SETOR%TYPE,
+    P_NR_NF IN t_pap_nf_entrada.NR_NF%TYPE,
+    P_NF_SERIE IN t_pap_nf_entrada.NF_SERIE%TYPE,
+    P_DT_EMISSAO IN t_pap_nf_entrada.DT_EMISSAO%TYPE,
+    P_DT_RECEB IN t_pap_nf_entrada.DT_RECEB%TYPE,
+    P_VAL_IPI IN t_pap_nf_entrada.VAL_IPI%TYPE,
+    P_VAL_ICMS IN t_pap_nf_entrada.VAL_ICMS%TYPE,
+    P_VAL_TOTAL IN t_pap_nf_entrada.VAL_TOTAL%TYPE
+    ) AS
+    V_COUNT_ITENS_PENDENTES NUMBER;
+    E_ERROR EXCEPTION;    
+BEGIN  
+    SELECT COUNT(*)
+      INTO V_COUNT_ITENS_PENDENTES
+      FROM T_PAP_ORDEM_COMPRA
+     WHERE CD_OC = P_CD_OC
+       AND STATUS_OC <> 'RECEBIDO';
+
+    IF V_COUNT_ITENS_PENDENTES > 0 THEN
+        INSERT INTO T_PAP_NF_ENTRADA(
+                    CD_NF,
+                    CD_OC,
+                    CD_FORNEC,
+                    CD_SETOR,
+                    NR_NF,
+                    NF_SERIE,
+                    DT_EMISSAO,
+                    DT_RECEB,
+                    VAL_IPI,
+                    VAL_ICMS,
+                    VAL_TOTAL)  
+             VALUES(SEQ_PAP_NF_ENTRADA.NEXTVAL, 
+                    P_CD_OC, 
+                    P_CD_FORNEC, 
+                    P_CD_SETOR, 
+                    P_NR_NF,
+                    P_NF_SERIE, 
+                    P_DT_EMISSAO, 
+                    P_DT_RECEB, 
+                    P_VAL_IPI, 
+                    P_VAL_ICMS,
+                    P_VAL_TOTAL);
+        COMMIT; 
+    ELSE 
+        RAISE E_ERROR;    
+    END IF;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+    RAISE_APPLICATION_ERROR(-20100, 'A ordem de compra não existe.');   
+WHEN E_ERROR THEN
+    RAISE_APPLICATION_ERROR(-20101, 'A ordem de compra não possui saldo pendente.');   
+    ROLLBACK;
+WHEN OTHERS THEN
+   RAISE_APPLICATION_ERROR(-20102, 'A Nota Fiscal já existe no sistema.');   
+END SP_PAP_NF_ENTRADA;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Procedure
+-- Finalidade: atualizar saldo em estoque
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_PAP_ATUALIZA_ESTOQUE_IN(
+    P_CD_NF NUMBER,
+    P_CD_NF_ITEM NUMBER
+    ) AS
+BEGIN
+    FOR V_REG IN (SELECT T_PAP_ORDEM_COMPRA.CD_PROD,
+                         T_PAP_NF_ENTRADA.CD_SETOR,
+                         T_PAP_NF_ENT_ITEM.QTD,
+                         T_PAP_NF_ENT_ITEM.VAL_UNIT,
+                         T_PAP_NF_ENT_ITEM.DT_FAB,
+                         T_PAP_NF_ENT_ITEM.LOTE,
+                         T_PAP_SETOR.NM_SETOR,
+                         T_PAP_NF_ENT_ITEM.CD_NF,
+                         T_PAP_NF_ENT_ITEM.CD_NF_ITEM
+                    FROM T_PAP_ORDEM_COMPRA
+                   INNER JOIN T_PAP_NF_ENTRADA 
+                      ON T_PAP_ORDEM_COMPRA.CD_OC = T_PAP_NF_ENTRADA.CD_OC
+                   INNER JOIN T_PAP_NF_ENT_ITEM
+                      ON T_PAP_NF_ENTRADA.CD_NF = T_PAP_NF_ENT_ITEM.CD_NF
+                   INNER JOIN T_PAP_SETOR
+                      ON T_PAP_NF_ENTRADA.CD_SETOR = T_PAP_SETOR.CD_SETOR
+                   WHERE T_PAP_NF_ENTRADA.CD_NF = P_CD_NF
+                     AND T_PAP_NF_ENT_ITEM.CD_NF_ITEM = P_CD_NF_ITEM)
+    LOOP
+        IF FC_PAP_CHECK_NF_ITEM_MOV(V_REG.CD_NF, V_REG.CD_NF_ITEM) = 0 THEN
+            INSERT INTO T_PAP_MOVIMENTO_ESTOQUE
+                VALUES(SEQ_PAP_MOV_ESTOQUE.NEXTVAL,
+                       SYSDATE,
+                       'E',
+                       V_REG.CD_PROD,
+                       V_REG.CD_SETOR,
+                       V_REG.QTD,
+                       V_REG.VAL_UNIT,
+                       V_REG.DT_FAB,
+                       V_REG.LOTE,
+                       V_REG.NM_SETOR,
+                       V_REG.CD_NF,
+                       V_REG.CD_NF_ITEM);
+            COMMIT;  
+            INSERT INTO T_PAP_ESTOQUE
+                VALUES(SEQ_PAP_MOV_ESTOQUE.CURRVAL,
+                       V_REG.CD_PROD,
+                       V_REG.CD_SETOR,
+                       V_REG.QTD,
+                       V_REG.LOTE);
+            COMMIT;
+        END IF;
+    END LOOP;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20100, 'A ordem de compra não existe.');   
+    WHEN OTHERS THEN
+        ROLLBACK;
+END SP_PAP_ATUALIZA_ESTOQUE_IN;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Procedure
+-- Finalidade: entrada de iten da NF e atualizar saldo em estoque
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_PAP_NF_ENTRADA_ITEM(
+    P_CD_NF IN T_PAP_NF_ENT_ITEM.CD_NF%TYPE,
+    P_CD_PROD IN T_PAP_ORDEM_COMPRA.CD_PROD%TYPE,
+    P_QTD IN T_PAP_NF_ENT_ITEM.QTD%TYPE,
+    P_VAL_UNIT IN T_PAP_NF_ENT_ITEM.VAL_UNIT%TYPE,
+    P_DT_FAB IN T_PAP_NF_ENT_ITEM.DT_FAB%TYPE,
+    P_LOTE IN T_PAP_NF_ENT_ITEM.LOTE%TYPE
+    )
+AS
+    E_ERROR          EXCEPTION;
+    V_TOTAL_RECEBIDO NUMBER;
+    V_SALDO_RECEBER  NUMBER;
+    V_CD_OC          T_PAP_ORDEM_COMPRA.CD_OC%TYPE;
+    V_STATUS_OC      T_PAP_ORDEM_COMPRA.STATUS_OC%TYPE;
+    V_QTD_ORDEM      T_PAP_ORDEM_COMPRA.QTD%TYPE;
+    V_NR_ORDEM       T_PAP_ORDEM_COMPRA.QTD%TYPE;
+    V_QTD_RECEBIDA   T_PAP_ORDEM_COMPRA.QTD_RECEBIDA%TYPE;
+BEGIN    
+    SELECT T_PAP_NF_ENTRADA.CD_OC
+      INTO V_CD_OC
+      FROM T_PAP_NF_ENTRADA
+     WHERE T_PAP_NF_ENTRADA.CD_NF = P_CD_NF;
+    
+     SELECT CD_OC, QTD, QTD_RECEBIDA, STATUS_OC
+       INTO V_NR_ORDEM, V_QTD_ORDEM, V_QTD_RECEBIDA, V_STATUS_OC
+       FROM T_PAP_ORDEM_COMPRA
+      WHERE T_PAP_ORDEM_COMPRA.CD_OC = V_CD_OC;
+      
+      V_TOTAL_RECEBIDO := V_QTD_RECEBIDA + P_QTD;
+      
+      IF V_STATUS_OC IN ('PENDENTE','PARCIAL') THEN
+        INSERT INTO T_PAP_NF_ENT_ITEM 
+          VALUES(SEQ_PAP_NF_ENTRADA_ITEM.NEXTVAL, 
+                 P_CD_NF, 
+                 P_CD_PROD,
+                 P_QTD, 
+                 P_VAL_UNIT, 
+                 P_DT_FAB, 
+                 P_LOTE);
+                 
+         IF V_QTD_ORDEM > V_TOTAL_RECEBIDO THEN
+            UPDATE T_PAP_ORDEM_COMPRA
+               SET QTD_RECEBIDA = V_TOTAL_RECEBIDO, STATUS_OC = 'PARCIAL'
+             WHERE CD_OC = V_NR_ORDEM;
+         ELSIF V_QTD_ORDEM <= V_TOTAL_RECEBIDO THEN
+            UPDATE T_PAP_ORDEM_COMPRA
+               SET QTD_RECEBIDA = V_TOTAL_RECEBIDO, STATUS_OC = 'RECEBIDO'
+             WHERE CD_OC = V_NR_ORDEM;
+         ELSE
+            UPDATE T_PAP_ORDEM_COMPRA
+               SET QTD_RECEBIDA = V_TOTAL_RECEBIDO, STATUS_OC = 'PENDENTE'
+             WHERE CD_OC = V_NR_ORDEM;
+         END IF; 
+      V_SALDO_RECEBER := V_QTD_ORDEM - P_QTD;
+      COMMIT;
+        BEGIN
+            SP_PAP_ATUALIZA_ESTOQUE_IN(P_CD_NF, SEQ_PAP_NF_ENTRADA_ITEM.CURRVAL);
+        END;
+      ELSE 
+        RAISE E_ERROR;
+      END IF;      
+EXCEPTION
+WHEN E_ERROR THEN
+    RAISE_APPLICATION_ERROR(-20101, 'OC sem saldo para entrada de Nota Fiscal.');   
+    ROLLBACK;
+WHEN OTHERS THEN
+    RAISE_APPLICATION_ERROR(-20102, 'Não é possível inserir o mesmo item inúmeras vezes.');      
+END SP_PAP_NF_ENTRADA_ITEM;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Procedure
+-- Finalidade: gerar saída de ressuprimento de estoque
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_PAP_RESSUPRIMENTO_ESTOQUE(
+    P_CD_SETOR IN T_PAP_ESTOQUE.CD_SETOR%TYPE) 
+AS
+BEGIN
+    FOR V_REG IN (SELECT T_PAP_PRODUTO.CD_PROD AS CODIGO,
+                         T_PAP_PRODUTO.DES_PROD AS DESCRICAO,
+                         T_PAP_PRODUTO.CD_PROD||' - '||T_PAP_PRODUTO.DES_PROD AS PRODUTO,
+                         T_PAP_PRODUTO.ESTOQUE_MINIMO,
+                         SUM(T_PAP_ESTOQUE.QUANT) SALDO_ATUAL
+                    FROM T_PAP_PRODUTO
+                   INNER JOIN T_PAP_ESTOQUE
+                      ON T_PAP_PRODUTO.CD_PROD = T_PAP_ESTOQUE.CD_PROD
+                   WHERE T_PAP_ESTOQUE.CD_SETOR = P_CD_SETOR
+                   GROUP BY T_PAP_PRODUTO.CD_PROD,
+                            T_PAP_PRODUTO.DES_PROD,
+                            T_PAP_PRODUTO.ESTOQUE_MINIMO
+                   ORDER BY T_PAP_PRODUTO.DES_PROD) LOOP       
+        
+        DBMS_OUTPUT.PUT_LINE('SETOR: '|| FC_PAP_GET_SETOR(P_CD_SETOR));
+        IF V_REG.ESTOQUE_MINIMO < V_REG.SALDO_ATUAL THEN
+            DBMS_OUTPUT.PUT_LINE('******************************************');
+            DBMS_OUTPUT.PUT_LINE('PRODUTO: ' || V_REG.PRODUTO);
+            DBMS_OUTPUT.PUT_LINE('ESTOQUE MINIMO: ' || V_REG.ESTOQUE_MINIMO); 
+            DBMS_OUTPUT.PUT_LINE('ESTOQUE ATUAL: ' || V_REG.SALDO_ATUAL); 
+            DBMS_OUTPUT.PUT_LINE('******************************************');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Não foram encontrados produtos com saldo de estoque abaixo ou igual ao minímo.');
+        END IF;
+    END LOOP;
+END SP_PAP_RESSUPRIMENTO_ESTOQUE;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Procedure
+-- Finalidade: atualizar cadastro de funcionário, delegando como
+--             vendedor. 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_PAP_DELEGA_FUNC_VENDEDOR(
+    P_COD_FUNC T_PAP_FUNCIONARIO.CD_FUNC%TYPE
+    )
+AS
+    V_CHECK NUMBER;
+    E_ERROR EXCEPTION;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_CHECK
+      FROM T_PAP_FUNCIONARIO
+     WHERE CD_FUNC = P_COD_FUNC;
+    
+    IF V_CHECK > 0 THEN
+    UPDATE T_PAP_FUNCIONARIO
+       SET CD_VENDEDOR = P_COD_FUNC
+     WHERE CD_FUNC = P_COD_FUNC;
+    ELSE
+        RAISE E_ERROR;
+    END IF;
+EXCEPTION
+WHEN E_ERROR THEN
+    RAISE_APPLICATION_ERROR(-20101, 'O funcionário não existe.');   
+    ROLLBACK;
+END SP_PAP_DELEGA_FUNC_VENDEDOR;
+
+/
+
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Procedure
+-- Finalidade: alertar ponto de reposicao por produto
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_PAP_RESSUPRIMENTO_ESTOQUE_PROD(
+    P_CD_PROD IN T_PAP_ESTOQUE.CD_PROD%TYPE) 
+AS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+    FOR V_REG IN (SELECT T_PAP_PRODUTO.CD_PROD AS CODIGO,
+                         T_PAP_PRODUTO.DES_PROD AS DESCRICAO,
+                         T_PAP_PRODUTO.CD_PROD||' - '||T_PAP_PRODUTO.DES_PROD AS PRODUTO,
+                         T_PAP_PRODUTO.ESTOQUE_MINIMO,
+                         SUM(T_PAP_ESTOQUE.QUANT) SALDO_ATUAL
+                    FROM T_PAP_PRODUTO
+                   INNER JOIN T_PAP_ESTOQUE
+                      ON T_PAP_PRODUTO.CD_PROD = T_PAP_ESTOQUE.CD_PROD
+                   WHERE T_PAP_PRODUTO.CD_PROD = P_CD_PROD
+                   GROUP BY T_PAP_PRODUTO.CD_PROD,
+                            T_PAP_PRODUTO.DES_PROD,
+                            T_PAP_PRODUTO.ESTOQUE_MINIMO
+                   ORDER BY T_PAP_PRODUTO.DES_PROD) LOOP       
+        
+        IF V_REG.ESTOQUE_MINIMO < V_REG.SALDO_ATUAL THEN
+            DBMS_OUTPUT.PUT_LINE('******************************************');
+            DBMS_OUTPUT.PUT_LINE('PRODUTO: ' || V_REG.PRODUTO||' ABAIXO DO ESTOQUE MINIMO');
+            DBMS_OUTPUT.PUT_LINE('******************************************');
+        END IF;
+    END LOOP;
+END SP_PAP_RESSUPRIMENTO_ESTOQUE_PROD;
+
+/
+
+---------------------------------------------------------------------------
+--TRIGGERS
+---------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: gravar log de produtos após inserção
+--             na tabela T_PAP_PRODUTO
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_IN_PRODUTO_LOG
+    BEFORE INSERT 
+    ON T_PAP_PRODUTO
+    FOR EACH ROW
+DECLARE
+    V_TEXT T_PAP_LOG.LOG_TEXTO%TYPE;
+BEGIN
+    V_TEXT := TO_CHAR('{"CADASTRO_PRODUTO":{"COD_PRODUTO":'||:NEW.CD_PROD||
+                      ',"DESC":'''||:NEW.DES_PROD||''',"MARCA":'||:NEW.CD_MARCA||'}}');   
+    SP_PAP_REGISTRA_LOG(V_TEXT);
+END TRG_PAP_IN_PRODUTO_LOG;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: gravar log de entrada de NF após inserção
+--             na tabela T_PAP_NF_ENTRADA 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_IN_NF_LOG
+    BEFORE INSERT 
+    ON T_PAP_NF_ENTRADA
+    FOR EACH ROW
+DECLARE
+    V_TEXT T_PAP_LOG.LOG_TEXTO%TYPE;
+BEGIN
+    V_TEXT := TO_CHAR('{"ENTRADA_NF":{"COD_NF":'||:NEW.CD_NF||
+                      ',"NR_NF":'||:NEW.NR_NF||'}}');
+    SP_PAP_REGISTRA_LOG(V_TEXT);
+END TRG_PAP_IN_NF_LOG;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: gravar log de movimento de estoque após inserção
+--             na tabela T_PAP_MOVIMENTO_ESTOQUE
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_IN_ESTOQUE_LOG
+    BEFORE INSERT 
+    ON T_PAP_MOVIMENTO_ESTOQUE
+    FOR EACH ROW
+DECLARE
+    V_TEXT T_PAP_LOG.LOG_TEXTO%TYPE;
+BEGIN
+    V_TEXT := TO_CHAR('{"MOV_ESTOQUE":{"COD_MOV":'||:NEW.COD_MOV||
+                      ',"TIPO_MOV":'''||:NEW.TIPO_MOV||''', "COD_PROD":'||:NEW.CD_PROD||'}}');
+    SP_PAP_REGISTRA_LOG(V_TEXT);
+END TRG_PAP_IN_NF_LOG;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: gravar log após deletar registro na tabela T_PAP_PRODUTO
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_DEL_PRODUTO_LOG
+    BEFORE DELETE 
+    ON T_PAP_PRODUTO
+    FOR EACH ROW
+DECLARE
+    V_TEXT T_PAP_LOG.LOG_TEXTO%TYPE;
+BEGIN
+    V_TEXT := TO_CHAR('{"DELECAO_PRODUTO":{"COD_PRODUTO":'||:OLD.CD_PROD||
+                      ',"MARCA":'||:OLD.CD_MARCA||'}}');
+    SP_PAP_REGISTRA_LOG(V_TEXT);
+END TRG_PAP_DEL_PRODUTO_LOG;
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: gravar log após atualizar registro na tabela T_PAP_PRODUTO
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_UP_PRODUTO_LOG
+    BEFORE UPDATE 
+    ON T_PAP_PRODUTO
+    FOR EACH ROW
+DECLARE
+    V_TEXT T_PAP_LOG.LOG_TEXTO%TYPE;
+BEGIN
+    V_TEXT := TO_CHAR('{"ATUALIZACAO_PRODUTO":{"COD_PRODUTO":'||:OLD.CD_PROD||
+                      ',"MARCA":'||:OLD.CD_MARCA||
+                      ', "VALOR_ATUAL":'''||:NEW.DES_PROD||'''}}');
+    SP_PAP_REGISTRA_LOG(V_TEXT);
+END TRG_PAP_UP_PRODUTO_LOG;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: gravar log após inserir registro na tabela T_PAP_PEDIDO
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_IN_PEDIDO_LOG
+    BEFORE INSERT 
+    ON T_PAP_PEDIDO
+    FOR EACH ROW
+DECLARE
+    V_TEXT T_PAP_LOG.LOG_TEXTO%TYPE;
+BEGIN
+    V_TEXT := TO_CHAR('{"PEDIDO":{"NR":'||:NEW.CD_PEDIDO||',"CLIENTE":'||:NEW.CD_CLIENTE||
+                      ', "VENDEDOR":'||:NEW.CD_FUNC||'}}');
+    SP_PAP_REGISTRA_LOG(V_TEXT);
+END TRG_PAP_IN_PEDIDO_LOG;
+
+/
+   
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: validar se existe usuário com login inserido 
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_CHECK_LOGIN
+    BEFORE INSERT
+    ON T_PAP_USUARIO
+    FOR EACH ROW
+DECLARE
+    V_COUNT NUMBER;
+BEGIN
+    SELECT COUNT(*)
+      INTO V_COUNT
+      FROM T_PAP_USUARIO
+     WHERE LOGIN = :NEW.LOGIN;
+    
+    IF V_COUNT >= 1 THEN
+        RAISE_APPLICATION_ERROR (-20000, 'Já existe usuário com este login. Digitar valor diferente.'); 
+    END IF;
+END TRG_PAP_CHECK_LOGIN;
+
+/
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: Alertar se o estoque do produto estiver abaixo da
+--             quantidade minima.
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_CHECK_ESTOQ_MIN
+    BEFORE INSERT OR UPDATE
+    ON T_PAP_ESTOQUE
+    FOR EACH ROW
+DECLARE
+BEGIN
+    CASE 
+        WHEN INSERTING THEN
+            SP_PAP_RESSUPRIMENTO_ESTOQUE_PROD(:NEW.CD_PROD);
+        WHEN UPDATING THEN
+            SP_PAP_RESSUPRIMENTO_ESTOQUE_PROD(:OLD.CD_PROD);
+    END CASE;
+END TRG_PAP_CHECK_ESTOQ_MIN;
+
+/
+
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: Trigger
+-- Finalidade: criptografar senha do usuário e salvar log
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_PAP_IN_HASH_USUPASS
+    BEFORE UPDATE OR INSERT
+    ON T_PAP_USUARIO
+    FOR EACH ROW
+DECLARE
+    V_TEXT T_PAP_LOG.LOG_TEXTO%TYPE;
+BEGIN
+  CASE
+    WHEN UPDATING THEN
+        IF :NEW.SENHA = :OLD.SENHA THEN
+            RAISE_APPLICATION_ERROR (-20000, 'Digite uma senha diferente da anterior.'); 
+        ELSE
+            :NEW.SENHA := DBMS_RANDOM.STRING( 'P', FLOOR( DBMS_RANDOM.VALUE(40, 61)));
+            SELECT STANDARD_HASH ( :NEW.SENHA || RTRIM( :NEW.SENHA ), 'SHA256' )
+              INTO :NEW.SENHA
+              FROM DUAL;
+        END IF;
+        V_TEXT := TO_CHAR('{"USUARIO_ATUALIZACAO":{"USUARIO":'''||:OLD.LOGIN||'''}}');
+        SP_PAP_REGISTRA_LOG(V_TEXT);
+    WHEN INSERTING THEN
+        :NEW.SENHA := DBMS_RANDOM.STRING( 'P', FLOOR( DBMS_RANDOM.VALUE(40, 61)));
+            SELECT STANDARD_HASH ( :NEW.SENHA || RTRIM( :NEW.SENHA ), 'SHA256' )
+              INTO :NEW.SENHA
+              FROM DUAL;
+        V_TEXT := TO_CHAR('{"USUARIO_CADASTRO":{"USUARIO":'''||:NEW.LOGIN||'''}}');
+        SP_PAP_REGISTRA_LOG(V_TEXT);
+  END CASE;
+END TRG_PAP_IN_HASH_USUPASS; 
+
+/ 
+
+---------------------------------------------------------------------------
+--VIEWS
+---------------------------------------------------------------------------
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: View
+-- Finalidade: View exibe os produtos cadastrados ativos
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE VIEW V_PAP_PRODUTOS_CADASTRADOS_ATIVOS
+AS
+SELECT T_PAP_ESPECIE_PROD.NM_ESPECIE,
+       T_PAP_GRUPO_PROD.NM_GRUPO,
+       T_PAP_MARCA.DES_MARCA,
+       T_PAP_COR.DES_COR,
+       T_PAP_PRODUTO.DES_PROD
+  FROM T_PAP_PRODUTO
+ INNER JOIN T_PAP_ESPECIE_PROD 
+    ON T_PAP_PRODUTO.CD_ESPECIE = T_PAP_ESPECIE_PROD.CD_ESPECIE
+ INNER JOIN T_PAP_GRUPO_PROD
+    ON T_PAP_GRUPO_PROD.CD_GRUPO = T_PAP_PRODUTO.CD_GRUPO
+ INNER JOIN T_PAP_MARCA
+    ON T_PAP_MARCA.CD_MARCA = T_PAP_PRODUTO.CD_MARCA
+ LEFT JOIN T_PAP_COR
+    ON T_PAP_COR.CD_COR = T_PAP_PRODUTO.CD_COR
+ WHERE T_PAP_PRODUTO.ST_PRODUTO = 1;
+ 
+/
+
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: View
+-- Finalidade: View exibe o cadastro de pessoa fisica e juridica
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE VIEW V_PAP_CADASTRO_PESSOA
+AS
+SELECT T_PAP_PESSOA.CD_PESSOA,
+       T_PAP_PESSOA.NM_PESSOA,
+       CASE 
+       WHEN T_PAP_PESSOA.TP_PESSOA = 'F'
+            THEN 'PESSOA FÍSICA'
+       WHEN T_PAP_PESSOA.TP_PESSOA = 'J'
+            THEN 'PESSOA JURÍDICA'
+       END AS TIPO_PESSOA,
+       CASE 
+       WHEN T_PAP_PESSOA.TP_PESSOA = 'F'
+            THEN FC_PAP_FORMATA_CPF(T_PAP_PF.NR_CPF)
+       WHEN T_PAP_PESSOA.TP_PESSOA = 'J'
+            THEN FC_PAP_FORMATA_CNPJ(T_PAP_PJ.NR_CNPJ)
+       END AS DOCUMENTO
+  FROM T_PAP_PESSOA
+  LEFT JOIN T_PAP_PF 
+    ON T_PAP_PESSOA.CD_PESSOA = T_PAP_PF.CD_PESSOA
+  LEFT JOIN T_PAP_PJ 
+    ON T_PAP_PESSOA.CD_PESSOA = T_PAP_PJ.CD_PESSOA;    
+
+/  
+-----------------------------------------------------------------
+-- PAPELARIA                                
+-----------------------------------------------------------------
+-- Banco.....: Oracle
+-- Versao....: 1
+-- Aluno.....: Juliano Figueredo
+-- Data......: 18/05/2021
+-- Objeto....: View
+-- Finalidade: View exibe o saldo de estoque
+-- Sistemas..: Papelaria
+---------------------------------------------------------------
+CREATE OR REPLACE VIEW V_PAP_SALDO_ESTOQUE_TOTAL
+AS
+SELECT T_PAP_PRODUTO.CD_PROD AS CODIGO,
+       T_PAP_PRODUTO.DES_PROD AS DESCRICAO,
+       T_PAP_PRODUTO.ESTOQUE_MINIMO,
+       SUM(T_PAP_ESTOQUE.QUANT) SALDO_ATUAL
+  FROM T_PAP_PRODUTO
+ INNER JOIN T_PAP_ESTOQUE
+    ON T_PAP_PRODUTO.CD_PROD = T_PAP_ESTOQUE.CD_PROD
+ GROUP BY T_PAP_PRODUTO.CD_PROD,
+       T_PAP_PRODUTO.DES_PROD,
+       T_PAP_PRODUTO.ESTOQUE_MINIMO
+ ORDER BY T_PAP_PRODUTO.DES_PROD;
+ 
+/
