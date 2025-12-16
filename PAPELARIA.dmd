@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="PAPELARIA" id="AFA45B57-7657-A16A-E82D-5ADE19E7194B" version="3.5">
+<createdBy>juliano</createdBy>
+<createdTime>2021-02-27 19:34:16 UTC</createdTime>
+<ownerDesignName>PAPELARIA</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>AFA45B57-7657-A16A-E82D-5ADE19E7194B</designId>
+</OSDM_Design>
